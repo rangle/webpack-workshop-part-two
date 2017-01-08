@@ -136,14 +136,13 @@ module.exports = {
 ---
 
 ### Loader configuration is through `options`:
-- You can no longer configure a loader with a custom property in the top-level. It must be done through the `options`
 
 ```js
 // Webpack 2
 module.exports = { 
   ...
   module: { 
-    use: [{ 
+    rules: [{ 
       test: /\.tsx?$/,
       loader: 'ts-loader?' + JSON.stringify({ transpileOnly: false })
     }]
@@ -157,7 +156,7 @@ or
 module.exports = { 
   ...
   module: { 
-    use: [{ 
+    rules: [{ 
       test: /\.tsx?$/,
       loader: 'ts-loader'
       options:  { transpileOnly: false }
@@ -168,3 +167,172 @@ module.exports = {
 
 ---
 
+### Chaining loaders
+
+```js
+// Webpack 1 loader chaining
+module: {
+  loaders: {
+    test: /\.less$/,
+    loader: "style-loader!css-loader!less-loader"
+  }
+}
+```
+
+```js
+// Webpack 2 loader chaining with loader names
+module: {
+  rules: [
+    {
+      test: /\.less$/,
+      use: [
+        "style-loader",
+        "css-loader",
+        "less-loader"
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### Chaining loaders
+
+```js
+// Webpack 2 loader chaining with configuration objects for each loader
+module: {
+  rules: [
+    {
+      test: /\.less$/,
+      use: [
+        {
+          loader: 'style-loader'
+        },
+        {
+          loader: 'css-loader',
+          options: {
+            importLoaders: 1
+          }
+        },
+        {
+          loader: 'less-loader',
+          options: {
+            noIeCompat: true
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### `UglifyJsPlugin` `sourceMap`
+- The `sourceMap` option of the `UglifyJsPlugin` now defaults to false instead of true. This means that if you are using source maps for minimized code, you need to set `sourceMap: true` for `UglifyJsPlugin`
+
+```js
+  devtool: "source-map",
+  plugins: [
+    new UglifyJsPlugin({
++     sourceMap: true
+    })
+  ]
+```
+
+### `UglifyJsPlugin` minimize loaders
+- UglifyJsPlugin no longer switches loaders into minimize mode. The `minimize: true` setting needs to be passed via loader options
+
+### `OccurrenceOrderPlugin` is now on by default
+- It's no longer necessary to specify it in configuration
+
+---
+
+### `new ExtractTextPlugin({options})`
+
+```js
+// Webpack 1
+plugins: [
+  new ExtractTextPlugin("bundle.css", {allChunks: true, disable: false})
+]
+```
+
+```js
+// Webpack 2
+plugins: [
+ new ExtractTextPlugin({
+     filename: "bundle.css",
+     disable: false,
+     allChunks: true
+    })
+]
+```
+
+---
+
+### `ExtractTextPlugin.extract`
+
+```js
+// Webpack 1
+module: {
+  rules: [
+    test: /.css$/,
+    loader: ExtractTextPlugin.extract['style-loader', 'css-loader']
+  ]
+}
+```
+
+```js
+// Webpack 2
+module: {
+  rules: [
+    test: /.css$/,
+    loader: ExtractTextPlugin.extract({
+               fallbackLoader: "style-loader",
+               loader: "css-loader"
+     })
+  ]
+}
+```
+
+---
+
+### `ExtractTextPlugin.extract`
+
+```js
+// Webpack 1
+module: {
+  rules: [
+    test: /.css$/,
+    loader: ExtractTextPlugin.extract['style-loader', 'css-loader?modules-true!postcss-loader!sass-loader-loader']
+  ]
+}
+```
+
+```js
+// Webpack 2
+var loaders = [
+  { loader: 'css-loader', options: { modules: true } },
+  { loader: 'postcss-loader' },
+  { loader: 'sass-loader' }
+]
+
+module: {
+  rules: [
+    test: /.css$/,
+    loader: ExtractTextPlugin.extract({
+               fallbackLoader: "style-loader",
+               loader: loaders
+     })
+  ]
+}
+```
+
+---
+
+## Exercise 1
+
+(Duration: 10 minutes)
+
+Modify the build system in Exercise 1 from Webpack 1 to Webpack 2
