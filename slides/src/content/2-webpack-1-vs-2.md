@@ -331,8 +331,8 @@ module: {
 
 ---
 
-## Exercise 1
+## Exercise
 
 (Duration: 10 minutes)
 
-Modify the build system in Exercise 1 from Webpack 1 to Webpack 2
+Modify the build system in exercise-2 from Webpack 1 to Webpack 2

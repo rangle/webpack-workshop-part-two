@@ -56,8 +56,9 @@ console.log('Production log')
 // package.json
 ...
 "scripts": {
-  "build": "cross-env NODE_ENV=production webpack --config webpack-aot.config.js",
-  "build:jit": "cross-env NODE_ENV=production webpack",
+  "build": "cross-env NODE_ENV=production webpack",
+  "build:dev": "cross-env NODE_ENV=development webpack",
+  "start:dev": "cross-env NODE_ENV=development webpack-dev-server",
   "start": "cross-env NODE_ENV=production http-server ./dist",
 }
 ...
@@ -67,11 +68,102 @@ console.log('Production log')
 
 ```js
 // webpack.config.js
+...
 new webpack.DefinePlugin({
-  PRODUCTION: JSON.stringify(true),
-  VERSION: JSON.stringify("5fa3b9"),
-  BROWSER_SUPPORTS_HTML5: true,
-  TWO: "1+1",
-  "typeof window": JSON.stringify("object")
+  PRODUCTION: JSON.stringify(process.env.NODE_ENV === 'production'),
+  DEVELOPMENT: JSON.stringify(process.env.NODE_ENV === 'development')
 })
+...
 ```
+
+---
+
+## Passing environment variables
+
+-  You can also have different webpack configuration based on build typeof
+
+```js
+const devPlugins = [
+  new StyleLintPlugin({
+    configFile: './.stylelintrc',
+    files: ['src/**/*.css']
+  }),
+];
+const prodPlugins = [
+  new webpack.optimize.UglifyJsPlugin({
+    sourceMap: true,
+  }),
+];
+
+module.exports = {
+ ... 
+ output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: process.env.NODE_ENV === 'production' ? '[name].[chunkhash].js' : '[name].js',
+    publicPath: '/',
+    sourceMapFilename: process.env.NODE_ENV === 'production' ? '[name].[chunkhash].js.map' : '[name].js.map',
+  plugins: 
+    process.env.NODE_ENV === 'production' ? prodPlugins : devPlugins;
+```
+
+---
+
+## Source maps
+
+| devtool |	build |	rebuild |	production | quality |
+|---------|-------|---------|------------|---------|
+| `eval` | +++ | +++ | no |	generated code |
+| `cheap-eval-source-map` |	+ |	++ | no |	transformed code (lines only) |
+| `cheap-source-map` | + | o | yes | transformed code (lines only) |
+| `cheap-module-eval-source-map` | o | ++ |	no | original source (lines only) |
+| `cheap-module-source-map` |	o |	-	 | yes | original source (lines only) |
+| `eval-source-map` |	-- | + | no |	original source |
+| `source-map` | -- |	--	| yes |	original source |
+| `nosources-source-map` | -- |	-- | yes |	without source content |
+
+---
+
+## Source maps
+
+### For development
+
+`eval` 
+- Each module is executed with `eval()` and `//@ sourceURL`. This is very fast. The main disadvantage is that it doesn't display line numbers correctly since it gets mapped to transpiled code instead of the original code.
+
+`inline-source-map` 
+- A SourceMap is added as DataUrl to the bundle.
+
+`eval-source-map` 
+- Each module is executed with `eval()` and a SourceMap is added as DataUrl to the `eval()`. Initially it is slow, but it provides fast rebuild speed and yields real files. Line numbers are correctly mapped since it gets mapped to the original code.
+
+`cheap-module-eval-source-map`
+- Like `eval-source-map`, each module is executed with `eval()` and a SourceMap is added as DataUrl to the `eval()`. It is "cheap" because it doesn't have column mappings, it only maps line numbers.
+
+---
+
+## Source maps
+
+### For production
+
+`source-map` 
+- A full SourceMap is emitted as a separate file. It adds a reference comment to the bundle so development tools know where to find it.
+
+`hidden-source-map` 
+- Same as source-map, but doesn't add a reference comment to the bundle. Useful if you only want SourceMaps to map error stack traces from error reports, but don't want to expose your SourceMap for the browser development tools.
+
+`cheap-source-map` 
+- A SourceMap without column-mappings ignoring loaded Source Maps.
+
+`cheap-module-source-map` 
+- A SourceMap without column-mappings that simplifies loaded Source Maps to a single mapping per line.
+
+`nosources-source-map` 
+- A SourceMap is created without the sourcesContent in it. It can be used to map stack traces on the client without exposing all of the source code.
+
+---
+
+## Exercise
+
+(Duration: 10 minutes)
+
+Modify the build system in exercise-3 to have a development and production build with appropriate source maps, and plugins
