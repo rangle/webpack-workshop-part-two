@@ -80,7 +80,7 @@ new webpack.DefinePlugin({
 
 ## Passing environment variables
 
--  You can also have different webpack configuration based on build typeof
+-  You can also have different webpack configuration based on build type
 
 ```js
 const devPlugins = [
@@ -100,11 +100,12 @@ module.exports = {
  output: {
     path: path.resolve(__dirname, 'dist'),
     filename: process.env.NODE_ENV === 'production' ? '[name].[chunkhash].js' : '[name].js',
-    publicPath: '/',
     sourceMapFilename: process.env.NODE_ENV === 'production' ? '[name].[chunkhash].js.map' : '[name].js.map',
   plugins: 
     process.env.NODE_ENV === 'production' ? prodPlugins : devPlugins;
 ```
+
+- Note: [chunkhash] slows down build time and is only useful to improve caching so only use it for production builds
 
 ---
 
