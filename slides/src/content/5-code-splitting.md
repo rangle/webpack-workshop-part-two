@@ -77,7 +77,7 @@ entry: {
 
 - Extracts all common modules from source chunks and puts them in a common chunk. If it doesn't already exist, then creates a new one
 - Webpack creates runtime and manifest code, and when `CommonsChunkPlugin` is used this code is placed in the common chunk.  
-- To enable long-term caching, add another common chunk so this code is stored in a seperate chunk and doesn't cause the primary common chunk to change with every build
+- To enable long-term caching, add another common chunk so this code is stored in a seperate chunk and doesn't cause the primary common chunk to change with every build.  An alternative is to have the manifest output to a seperate file via a plugin like `ChunkManifestPlugin`
 
 ```js
 var webpack = require('webpack');
@@ -105,48 +105,101 @@ module.exports = function(env) {
 ## `CommonsChunkPlugin`
 
 - The Common chunk(s) become the parent chunks of the source chunks
-- Use options (full list [here](https://webpack.js.org/plugins/commons-chunk-plugin/)) to tailor to use-case
+- Use options (full list [here](https://webpack.js.org/plugins/commons-chunk-plugin/)) to tailor to use-case (see plugin source [here](https://github.com/webpack/webpack/blob/master/lib/optimize/CommonsChunkPlugin.js))
 - `name` or `names` specify the name(s) of common chunk(s)
-    - If they match an existing chunk(s), then that/those chunk(s) will be used as the common chunk(s) (multiple `names` result in multiple runs of the plugin)
+    - If matches existing chunk(s), then that chunk(s) will be the common chunk(s) (multiple `names` result in multiple runs of the plugin)
     - If the `name` doesn't match an existing chunk then a new chunk will be created with matching name(s)
-    - If omitted and `children` or `async` is set then all chunks are used, otherwise the `filename` is used as the common chunk name
+    - If omitted and `children` or `async` is set then all chunks are used
 - `filename` specifies the filename to use for the common bundle(s)
     - If omitted then the original output.filename or output.chunkFilename is used
     - Can contain the same placeholders as output.filename
 - `minChunks` specifies how many modules must share a common chunk before that chunk is pulled into the common chunk (can be `number`, `Infinity`, or `(module, count) => boolean`). Set to `Infinity` to create a common chunk but prevent any other chunks added to it
 - `minSize` specifies the minimum size that the combination of common modules must be before a common chunk is created to contain them
 - `chunks` the array of source chunks (if omitted all entry chunks are used)
-- `children` if set to `true` then all children of the common chunk are also sources (common modules moved up to parent common chunk)
-- `async` if set to `true` then a seperate chunk is created as a child of the common chunk, this async chunk will contain all the common modules and will be loaded in parallel, set to a `string` to name that async chunk
+- `children` if set to `true`, overrides `chunks`, and all children of the common chunk are sources (common modules moved up to parent common chunk)
+- `async` if set to `true`, a seperate chunk is created as a child of the common chunk, this async chunk will contain all the common modules and will be loaded in parallel, set to a `string` to name that async bundle
 
 ---
 
-## On-demand splitting (with `require.ensure()` AMD `require()` or `import()`)
+## On-demand splitting (with `require.ensure()`, AMD `require()`, or `import()`)
 
 - Webpack parses for `require.ensure()`, the AMD `require()`, or ES6 `import()` in the code while building and adds the modules into a separate chunk
 - This new chunk is loaded on demand by webpack through Jsonp (when `target` is `web`).
 
 ```js
 require.ensure(dependencies: String[], callback: function(require), chunkName: String) // Standard Webpack v1 approach
-require(dependencies: String[], callback: function(depedency-exports))                 // AMD async require approach
-import(dependency : String) : Promise                                                  // ES6 async import approach
+require(dependencies: String[], callback: function(depedency-exports))                 // AMD require approach
+import(dependency : String) : Promise                                                  // ES6 System.import approach
 ```
 
+- The dependencies are placed in a different chunk (can be another existing chunk for `require.ensure()`)
 - When using `require.ensure()` 
     - The dependencies are loaded first (but not executed), then the callback is executed
-    - Callback is passed implementation of `require` to allow tracking synchronous dependencies in callback
-    - The dependencies and any others inside the callback are all added to a different chunk
-    - The different chunk can be named by the optional 3rd parameter (if existing then same instance is used)
+    - Callback is passed implementation of `require` (still need to `require` modules from depedencies to evaluate and use exports)
+    - The split chunk can be named by the optional 3rd parameter (if existing then same instance is used).  This is the only approach that allows that
 - When using `require()` (AMD)
-    - The dependencies are loaded and executed and their exports are passed to the callback
+    - The dependencies are loaded and executed and their exports are then passed to the optional callback
+- When using `import()`
+    - The function loads the module and returns a `Promise`.  Allows load failure to be handled
+    - Can load multiple modules in parallel via `Promise.all()`
+
+---
+
+## On-demand splitting (with `require.ensure()`, AMD `require()`, or `import()`)
+
+```js
+require.ensure(["module-a", "module-b"], function() {
+  var a = require("module-a");
+  ...
+});
+```
+- `module-a` and `module-b` are loaded asynchronously (but not executed) then the callback function is called, within callback module-a is executed
+
+```js
+// AMD require
+require(["module-a", "module-b"], function(a, b) {
+  ...
+});
+```
+- `module-a` and `module-b` are loaded and executed asynchronously then the callback function is called and passed the exports of both modules
+
+```js
+import("./module-a").then(module => {
+    return module.default;
+}).catch(err => {
+    console.log("Chunk loading failed");
+});
+```
+- `module-a` is loaded and executed asynchronously and a `Promise` is returned
 
 ---
 
 ## CSS splitting
 
-- When using `css-loader` to bundle CSS with the JS the disadvantage is that CSS can't be loaded async and in parallel, no styling until the full bundle is loaded
+- With `css-loader` CSS is bundled with JS, the disadvantage is CSS can't be loaded async/in-parallel, no styling until the full bundle is loaded
 - Instead could use `ExtractTextPlugin` to extract the CSS into a seperate bundle to be injected into the index.html and loaded in parallel
 
+```js
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
+module.exports = {
+    entry: './main.js',
+    output: {
+        path: './dist',
+        filename: 'bundle.js'
+    },
+    module: {
+        rules: [{
+            test: /\.css$/,
+            exclude: /node_modules/,
+            loader: ExtractTextPlugin.extract({ loader: 'css-loader?sourceMap' })
+        }]
+    },
+    devtool: 'source-map',
+    plugins: [
+        new ExtractTextPlugin({ filename: 'bundle.css', disable: false, allChunks: true })
+    ]
+}
+```
 ---
 
 ## `DllPlugin` and `DllReferencePlugin`
