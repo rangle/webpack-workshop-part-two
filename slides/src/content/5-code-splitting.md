@@ -123,14 +123,22 @@ module.exports = function(env) {
 
 ## On-demand splitting (with `require.ensure()` AMD `require()` or `import()`)
 
-- Webpack parses for `require.ensure()`, `import()`, and the AMD `require()` in the code while building and adds the modules into a separate chunk
-- This new chunk is loaded on demand by webpack through jsonp.
+- Webpack parses for `require.ensure()`, the AMD `require()`, or ES6 `import()` in the code while building and adds the modules into a separate chunk
+- This new chunk is loaded on demand by webpack through Jsonp (when `target` is `web`).
 
 ```js
-require.ensure(dependencies: String[], callback: function(require), chunkName: String)
-require(dependencies: String[], function(depedency-exports))
-import(dependcy : String) : Promise
+require.ensure(dependencies: String[], callback: function(require), chunkName: String) // Standard Webpack v1 approach
+require(dependencies: String[], callback: function(depedency-exports))                 // AMD async require approach
+import(dependency : String) : Promise                                                  // ES6 async import approach
 ```
+
+- When using `require.ensure()` 
+    - The dependencies are loaded first (but not executed), then the callback is executed
+    - Callback is passed implementation of `require` to allow tracking synchronous dependencies in callback
+    - The dependencies and any others inside the callback are all added to a different chunk
+    - The different chunk can be named by the optional 3rd parameter (if existing then same instance is used)
+- When using `require()` (AMD)
+    - The dependencies are loaded and executed and their exports are passed to the callback
 
 ---
 
