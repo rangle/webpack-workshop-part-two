@@ -8,7 +8,7 @@
 
 - Part 2 of 3 part Webpack workshop series
 - Part 1 is Introductory, no assumption of past Webpack experience
-- Part 2/3 are Intermediate/Advanced, expect some past experience and familiarity with Webpack
+- Part 2 and 3 are Intermediate, expect some past experience and familiarity with Webpack
 - Can attend part 2 or 3 without completing prior workshops
 - This part is 2 hours, with 5 sections
 - Combination of material and exercises
