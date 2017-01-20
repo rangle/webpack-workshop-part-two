@@ -1,4 +1,4 @@
-# Advanced Webpack Workshop
+# Webpack Workshop, Part 2
 
 # Rangle.io
 
@@ -6,8 +6,11 @@
 
 ## Workshop Structure
 
-- 2 hours
-- 8 sections
+- Part 2 of 3 part Webpack workshop series
+- Part 1 is Introductory, no assumption of past Webpack experience
+- Part 2/3 are Intermediate/Advanced, expect some past experience and familiarity with Webpack
+- Can attend part 2 or 3 without completing prior workshops
+- This part is 2 hours, with 5 sections
 - Combination of material and exercises
 - Slides and resolved exercises available
 - Have the slides open in your computer as a guide
@@ -37,6 +40,3 @@ npm start
 3. Integrating Linting
 4. Code-splitting and CommonsChunkPlugin
 5. Some other useful loaders and plugins
-6. Writing loaders and plugins
-7. Hot Module Replacement and Lazy-loading
-8. Tree-shaking
