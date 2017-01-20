@@ -1,4 +1,4 @@
-# Advanced Webpack Workshop
+# Webpack Workshop, Part 2
 
 ## Target Audience
 
@@ -25,21 +25,15 @@ To take this workshop, you will need to have Node 4 (or better) installed in you
 
 # Topics
 
-* **Webpack 1 vs 2.** What are the main differences with webpack 2 and the key changes in syntax? (10 minutes)
+* **Webpack 1 vs 2.** What are the main differences with webpack 2 and the key changes in syntax? (20 minutes)
 
 * **The DefinePlugin and multiple environment builds.** Using the DefinePlugin to help configure different builds for development, production, and test. (20 minutes)
 
-* **Integrating Linting.** Integrating linting for Javascript, Typescript, and CSS via tslint, jslint, jshint, eslint, stylelint (20 minutes)
+* **Integrating Linting.** Integrating linting for Javascript, Typescript, and CSS via tslint, jslint, jshint, eslint, stylelint (25 minutes)
 
-* **Code-splitting and CommonsChunkPlugin.** An introduction to the CommonsChunkPlugin and webpack code splitting (20 minutes)
+* **Code-splitting and CommonsChunkPlugin.** An introduction to the CommonsChunkPlugin and webpack code splitting (30 minutes)
 
-* **Some other useful loaders and plugins.** A review of some of the more popular loaders and plugins and their usage (20 minutes)
-
-* **Writing loaders and plugins.** An introduction to writing webpack loaders and plugins (20 minutes)
-
-* **Hot Module Replacement and Lazy-loading.** An introduction to webpack hot module replacement and lazy loading (20 minutes)
-
-* **Tree-shaking.** An introduction to tree-shaking with webpack (20 minutes)
+* **Some other useful loaders and plugins.** A review of some of the more popular loaders and plugins and their usage (25 minutes)
 
 # Slides
 
