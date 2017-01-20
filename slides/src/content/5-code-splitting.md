@@ -174,10 +174,25 @@ import("./module-a").then(module => {
 
 ---
 
-## CSS splitting
+## CSS splitting (with `ExtractTextPlugin`)
 
-- With `css-loader` CSS is bundled with JS, the disadvantage is CSS can't be loaded async/in-parallel, no styling until the full bundle is loaded
-- Instead could use `ExtractTextPlugin` to extract the CSS into a seperate bundle to be injected into the index.html and loaded in parallel
+Advantages:
+- Fewer style tags (older IE has a limit)
+- CSS SourceMap (with `devtool: "source-map"` and `css-loader?sourceMap`)
+- CSS requested in parallel
+- CSS cached separate
+- Faster runtime (less code and DOM operations)
+
+Caveats:
+- Additional HTTP request
+- Longer compilation time
+- More complex configuration
+- No runtime public path modification
+- No Hot Module Replacement
+
+---
+
+## CSS splitting (with `ExtractTextPlugin`)
 
 ```js
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -191,7 +206,7 @@ module.exports = {
         rules: [{
             test: /\.css$/,
             exclude: /node_modules/,
-            loader: ExtractTextPlugin.extract({ loader: 'css-loader?sourceMap' })
+            loader: ExtractTextPlugin.extract({ loader: 'css-loader' })
         }]
     },
     devtool: 'source-map',
@@ -200,9 +215,111 @@ module.exports = {
     ]
 }
 ```
+
+---
+
+## CSS splitting (with `ExtractTextPlugin`)
+
+```js
+new ExtractTextPlugin(options: filename | object) // plugin
+```
+
+- `options.filename: string` (required) the filename of the result file. May contain `[name]`, `[id]` and `[contenthash]`
+    - `[contenthash]`: a hash of the content of the extracted file
+- `options.allChunks: boolean` extract from all additional chunks too (by default it extracts only from the initial chunk(s))
+- `options.disable: boolean` disables the plugin
+- `options.id: string` Unique ident for this plugin instance. (For advanced usage only, by default automatically generated)
+
+```js
+ExtractTextPlugin.extract(options: loader | object) // loader
+```
+- Creates an extracting loader from an existing loader. Supports loaders of type `{ loader: string; query: object }`
+- `options.loader: string | object | loader[]` (required) the loader(s) to use for converting the resource to a css exporting module
+- `options.fallbackLoader: string | object | loader[]` the loader(s) to use when the css is not extracted (i.e. in an additional chunk when `allChunks: false`)
+- `options.publicPath: string` override the `publicPath` setting for this loader
+
+---
+
+## CSS splitting (with `ExtractTextPlugin`)
+
+- There is also an `extract()` method on the instance which can be used for multiple plugin usage
+
+```js
+let ExtractTextPlugin = require('extract-text-webpack-plugin');
+
+// multiple extract instances
+let extractCSS = new ExtractTextPlugin('stylesheets/[name].css');
+let extractLESS = new ExtractTextPlugin('stylesheets/[name].less');
+
+module.exports = {
+  ...
+  module: {
+    loaders: [
+      { test: /\.scss$/i, loader: extractCSS.extract(['css','sass']) },
+      { test: /\.less$/i, loader: extractLESS.extract(['css','less']) },
+      ...
+    ]
+  },
+  plugins: [
+    extractCSS,
+    extractLESS
+  ]
+};
+```
+
 ---
 
 ## `DllPlugin` and `DllReferencePlugin`
 
-- Provides another approach to code-splitting where 
+- Provides another approach to code-splitting for improved caching and faster build times
+- Build vendor code into library bundle(s) (basically a mapping function that loads the appropriate vendor module from an id), on subsequent rebuilds where vendor code hasn't changed, the library bundle(s) is reused and the build is faster
+- Library bundle(s) can be long-term cached
+- Use two webpack config files, one for building library bundle(s) and other for building application
+- Use `DllPlugin` in webpack config to build library bundle and `DllReferencePlugin` in application bundle to reference it
+
+```js
+// app.webpack.config.js
+var webpack = require('webpack');
+module.exports = {
+  entry: {
+    app: ['./app'],
+  },
+  output: {
+    filename: 'app.bundle.js',
+    path: 'build/',
+  },
+  plugins: [new webpack.DllReferencePlugin({
+    context: '.',
+    manifest: require('./build/vendor-manifest.json'),
+  })]
+};
+```
+
+---
+
+## `DllPlugin` and `DllReferencePlugin`
+
+```js
+// vendor.webpack.config.js
+var webpack = require('webpack');
+module.exports = {
+  entry: { vendor: ['./vendor'] },
+  output: {
+    filename: 'vendor.bundle.js',
+    path: 'build/',
+    library: 'vendor_lib',
+  },
+  plugins: [new webpack.DllPlugin({
+    name: 'vendor_lib',
+    path: 'build/vendor-manifest.json',
+  })]
+};
+```
+- `manifest`: manifest file contains mapping from library bundle ids to actual module
+- `path`: absolute path to the manifest json file
+- `name`: name of the exposed dll function (keep consistent with output.library)
+- `context` (optional): context of requests in the manifest file, defaults to the webpack context
+- vs `CommonsChunkPlugin` the vendor code doesn't need to be recompiled every build
+- Which is better?  Depends on priorities.  Easy to experiment
+
 
