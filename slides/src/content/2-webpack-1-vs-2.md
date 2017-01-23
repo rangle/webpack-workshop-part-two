@@ -55,6 +55,10 @@
 ---
 
 ### `module.loaders`  ->  `module.rules` and no automatic `-loader`:
+- Can still use `module.loaders` for now if desired, though recommended to switch to `module.rules`
+  - If using `module.loaders` can still use `!` chain for multiple loaders, if using `module.rules` must chain loaders as shown below
+- `module.rules[i].loader` is optional shortcut to `module.rules[i].use.loader` 
+  - For optional use if single loader in chain and it has no `options`, or the options are provided in the loader with `?` query string
 
 ```js
 // Webpack 2
