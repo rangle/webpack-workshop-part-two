@@ -1,4 +1,5 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   context: __dirname + '/src',
@@ -12,6 +13,7 @@ module.exports = {
   resolve: {
     extensions: ['', '.ts', '.js'],
   },
+  devtool: 'source-map',
   module: {
     preLoaders: [{
       test: /\.ts$/,
@@ -21,7 +23,7 @@ module.exports = {
     loaders: [
       {
         test: /\.ts$/,
-        loader: 'awesome-typescript-loader',
+        loader: 'awesome-typescript',
         exclude: /node_modules/,
       },
       {
@@ -34,8 +36,10 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './index.html'
-    })   
+    }),
+    new webpack.optimize.UglifyJsPlugin()
   ],
+  ts: { transpileOnly: true },
   devServer: {
     noInfo: true,
     port: 8081
