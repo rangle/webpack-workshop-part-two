@@ -9,12 +9,12 @@ module.exports = {
   },
   output: {
     path: __dirname + '/dist',
-    filename: '[name].[chunkhash].js'
+    filename: process.env.NODE_ENV === 'production' ? '[name].[chunkhash].js' : '[name].js'
   },
   resolve: {
     extensions: ['.ts', '.js'],
   },
-  devtool: 'source-map',
+  devtool: process.env.NODE_ENV === 'production' ? 'source-map' : 'inline-source-map',
   module: {
     rules: [{
       test: /\.ts$/,
@@ -38,10 +38,15 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './index.html'
     }),
-    new webpack.optimize.UglifyJsPlugin({
-      sourceMap: true
+    new webpack.DefinePlugin({
+      PRODUCTION: process.env.NODE_ENV === 'production',
+      GET_DATA_URL: process.env.NODE_ENV === 'production' ? JSON.stringify('https://jsonplaceholder.typicode.com/posts/2')
+        : JSON.stringify('https://jsonplaceholder.typicode.com/posts/3'),
+      POST_ERROR_URL: JSON.stringify('http://jsonplaceholder.typicode.com/posts')
     })
-  ],
+  ].concat(process.env.NODE_ENV === 'production' ? [new webpack.optimize.UglifyJsPlugin({
+    sourceMap: true
+  })] : []),
   devServer: {
     noInfo: true,
     port: 8081

@@ -16,22 +16,21 @@ module.exports = {
   devtool: 'source-map',
   module: {
     rules: [{
-        test: /\.ts$/,
-        enforce: 'pre',
-        loader: 'tslint-loader',
-        exclude: /node_modules/,
-      },
-      {
-        test: /\.ts$/,
-        use: [{ loader: 'awesome-typescript-loader', options: { transpileOnly : true } }],
-        exclude: /node_modules/
-      },
-      {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
-        exclude: /node_modules/,
-      }
-    ]
+      test: /\.ts$/,
+      enforce: 'pre',
+      loader: 'tslint-loader',
+      exclude: /node_modules/,
+    },
+    {
+      test: /\.ts$/,
+      use: [{ loader: 'awesome-typescript-loader', options: { transpileOnly: true } }],
+      exclude: /node_modules/
+    },
+    {
+      test: /\.css$/,
+      use: ['style-loader', 'css-loader'],
+      exclude: /node_modules/,
+    }]
   },
   plugins: [
     new HtmlWebpackPlugin({

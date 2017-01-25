@@ -7,9 +7,11 @@
   "license": "ISC",
   "repository": {},
   "scripts": {
-    "build": "npm run clean && webpack",
+    "build:dev": "npm run clean && cross-env NODE_ENV=development webpack",
+    "build:prod": "npm run clean && cross-env NODE_ENV=production webpack",
     "clean": "rimraf dist/",
-    "start": "webpack-dev-server"
+    "start:dev": "cross-env NODE_ENV=development webpack-dev-server",
+    "start": "http-server ./dist"
   },
   "dependencies": {
     "@types/whatwg-fetch": "0.0.33",
@@ -17,8 +19,10 @@
   },
   "devDependencies": {
     "awesome-typescript-loader": "3.0.0-beta.18",
+    "cross-env": "^3.1.4",
     "css-loader": "0.26.1",
     "html-webpack-plugin": "2.26.0",
+    "http-server": "0.9.0",
     "rimraf": "2.5.4",
     "style-loader": "0.13.1",
     "tslint": "4.3.1",
