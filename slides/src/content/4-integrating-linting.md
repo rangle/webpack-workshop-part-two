@@ -34,6 +34,7 @@
 
 - Optional JS, JSON or YAML config file
   - Could be `.eslintrc.*` file, `eslintConfig` property in `package.json`, or another config file specified via CLI
+  - Generate config file with sensible defaults with `eslint --init`
 
 ---
 ## Javascript Linters
@@ -69,6 +70,7 @@ module.exports = {
 - Use with webpack via `tslint-loader`, use `tslint.json` (or custom) file for options
 - Optionally pass loader options in `webpack.config.js` (currently must use the `LoaderOptionsPlugin`)
 - Use `configuration.rules`, `configFile`, `emitErrors`, `failOnHint`, and other options (see full list [here](https://github.com/wbuchwalter/tslint-loader))
+- Generate config file with sensible defaults with `tslint --init`
 
 ```js
 module.exports = {
@@ -95,8 +97,9 @@ module.exports = {
 
 **Stylelint**
 - Newer, more popular tool for CSS linting, use config file to enable and configure rules (typically `.stylelintrc`)
-- For webpack use with `stylelint-webpack-plugin`
+- For webpack don't use loader, use with `stylelint-webpack-plugin` instead
 - Options via plugin config, `config`, `configFile`, `files`, `failOnError`, `quiet` and others (see full list [here](https://github.com/JaKXz/stylelint-webpack-plugin) and [here](http://stylelint.io/user-guide/node-api/#options))
+- If it can't find your css files, try setting the `context` option
 
 ```js
 module.exports = {
@@ -108,8 +111,7 @@ module.exports = {
         files: ['src/**/*.css'],
         failOnError: false,
       }),
-    ]
-  }
+    ...
 }
 ```
 

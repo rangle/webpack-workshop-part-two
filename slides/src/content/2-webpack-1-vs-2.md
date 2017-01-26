@@ -24,6 +24,8 @@
 
 - [See webpack 2 docs for full details](https://webpack.js.org/guides/migrating/)
 
+- Webpack 2 docs are a WIP but improving daily, Webpack 1 docs are still a good reference as well [see them here](http://webpack.github.io/docs/)
+
 ---
 
 ### `resolve.*`:
@@ -113,7 +115,7 @@
           use: [
             {
               loader: "style-loader"
-            },
+            }
         ...
   module: {
       rules: [ 
@@ -242,6 +244,27 @@ module.exports = {
 
 ---
 
+#### `LoaderOptionsPlugin`
+- Exists to help move from webpack 1 to webpack 2 (to save loaders from having to change to support Wepback 2)
+  - Webpack schema for webpack.config.js is stricter
+  - No longer open for extension loaders / plugins
+  - Intention is to pass options directly to loaders / plugins. i.e. no shared/global options
+  - Until all loaders updated to use options passed directly to them, the `loader-options-plugin` exists to bridge the gap
+  - Can configure global/shared loader options with this plugin and all loaders will receive these options
+  - In the future this plugin may be removed
+
+```js
+new webpack.LoaderOptionsPlugin({
+  minimize: true,
+  debug: false,
+  options: {
+    context: __dirname
+  }
+})
+```
+
+---
+
 ### Chaining loaders
 
 ```js
@@ -308,7 +331,7 @@ module: {
 - The `sourceMap` option of the `UglifyJsPlugin` now defaults to false instead of true. This means that if you are using source maps for minimized code, you need to set `sourceMap: true` for `UglifyJsPlugin`
 
 ```js
-  devtool: "source-map",
+  devtool: "source-map", // even with this devool option set, you still need the plugin option below
   plugins: [
     new UglifyJsPlugin({
 +     sourceMap: true

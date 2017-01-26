@@ -4,7 +4,7 @@
 
 ## Some other popular loaders
 
-#### `raw-loader`:
+#### `raw-loader` (see code [here](https://github.com/webpack-contrib/raw-loader/blob/master/index.js)):
 - Allows importing a file to JS `string` by wrapping file content in `"module.exports = " + JSON.stringify(content);`
 - Typically used to feed HTML/CSS/TXT files into JS for processing by other loaders
 
@@ -12,7 +12,7 @@
 import txt from 'raw-loader!./file.txt'; // txt is a string
 ```
 
-#### `to-string-loader`:
+#### `to-string-loader` (see code [here](https://github.com/gajus/to-string-loader/blob/master/src/to-string.js)):
 - Similar to `raw-loader` except it passes input content through `require` and converts the resulting exports object to a `string` (if it isn't already, via `toString()`)
 - Typically used after `css-loader` to convert it's output `Array` to string
 
@@ -23,7 +23,7 @@ let output = require('to-string-loader!css-loader!./my.css');
 
 ---
 
-#### `css-loader`:
+#### `css-loader` (see code [here](https://github.com/webpack-contrib/css-loader/blob/master/lib/loader.js)):
 - Processes CSS files, converting `@import` and `url()` to `require` and loading dependencies through appropriate other loaders
 - Optionally performs CSS minification and creates CSS SourceMap  
 - Can inject output into DOM via `style-loader` or into `string` (to be further handled by another loader) via `to-string-loader` or `raw-loader`
@@ -39,7 +39,7 @@ import css from 'style-loader!css-loader!./file.css';
 
 ---
 
-#### `style-loader`:
+#### `style-loader` (see code [here](https://github.com/webpack-contrib/style-loader/blob/master/index.js)):
 - Adds CSS to the DOM by injecting `<style>` tags into `window.document` (Can control with reference counting API with `style-loader/useable`)
 - Typically chained with `css-loader`, though can be chained with `raw-loader` (if CSS doesn't use `@import`, `url`, or scoping with `:local`, or `:global`)
 - Can place as CSS string or url (using `style-loader/url`)
@@ -60,7 +60,7 @@ style.unuse(); // or style.unref();
 
 ---
 
-#### `postcss-loader`:
+#### `postcss-loader` (see code [here](https://github.com/postcss/postcss-loader/blob/master/index.js)):
 - Use postcss plugins to process CSS, chain after `css-loader` (first loader in CSS file loader chain)
 - Can configure postcss plugins directly in `webpack.config.js` but recommended to place in `postcss.config.js`
 - Set `importLoaders=1` option if used before `css-loader` in chain (or >1 if other loaders before also)
@@ -89,7 +89,7 @@ module.exports = {
 
 ---
 
-#### `file-loader`:
+#### `file-loader` (see code [here](https://github.com/webpack-contrib/file-loader/blob/master/index.js)):
 - Emits file to output folder and returns url to publicPath (file emit can be disabled for server-side packages)
 - Can use special placeholders like `[ext]` (extension), `[name]` (basename), `[hash]` (hash of content, md5 by default), etc.. (see full list [here](https://github.com/webpack/file-loader))
 
@@ -102,7 +102,7 @@ require("file-loader?name=js/[hash].script.[ext]!./javascript.js");
 // emits javascript.js as js/0dcbbaa701328a3c262cfd45869e351f.script.js
 ```
 
-#### `url-loader`:
+#### `url-loader` (see code [here](https://github.com/webpack-contrib/url-loader/blob/master/index.js)):
 - Works like `file-loader`, but can return a Data Url if the file is smaller than a limit, if larger uses `file-loader` and passes query params
 
 ```js
@@ -116,7 +116,7 @@ var url = require("url-loader?prefix=img/!./file.png");
 
 ---
 
-#### `imports-loader`:
+#### `imports-loader` (see code [here](https://github.com/webpack-contrib/imports-loader/blob/master/index.js)):
 - Allows you to use modules that depend on specific global variables
 
 ```js
@@ -128,7 +128,7 @@ require("imports-loader?this=>window!./example.js");
 // wraps code in example.js in (function () { ... }).call(window);
 ```
 
-#### `exports-loader`:
+#### `exports-loader` (see code [here](https://github.com/webpack-contrib/exports-loader/blob/master/index.js)):
 - Add exports to the source file
 
 ```js
@@ -138,7 +138,7 @@ require("exports-loader?file!./file.js");
 // adds following code the the file's source: module.exports = file; 
 ```
 
-#### `expose-loader`:
+#### `expose-loader` (see code [here](https://github.com/webpack-contrib/expose-loader/blob/master/index.js)):
 - Exposes the exports of a module to the global context (`window` in the browser)
 
 ```js
@@ -147,12 +147,12 @@ require("expose-loader?libraryName!./file.js"); // exports exposed to global con
 
 ---
 
-#### `babel-loader`:
+#### `babel-loader` (see code [here](https://github.com/babel/babel-loader/blob/master/src/index.js)):
 - Transpile ES6 to ES5 with Babel via `babel-loader`
 - Typically use `.babelrc` file to set options but can also set options directly on loader
 
 
-#### `awesome-typescript-loader`:
+#### `awesome-typescript-loader` (see code [here](https://github.com/s-panferov/awesome-typescript-loader/blob/master/src/index.ts)):
 - Better performance alternative to `ts-loader` for transpiling Typescript files
 - Can fork type-checker into a seperate process to speed up compilation (use `CheckerPlugin` formerly `ForCheckerPlugin`)
 
@@ -169,14 +169,14 @@ module.exports = {
 };
 ```
 
-#### `istanbul-instrumenter-loader`:
+#### `istanbul-instrumenter-loader` (see code [here](https://github.com/deepsweet/istanbul-instrumenter-loader/blob/master/index.js)):
 - Instrument JS files with `istanbul-lib-instrument` for subsequent code coverage reporting, works with Karma and `karma-webpack`
 - Config done in `karma.conf.js`
 - Requires creation of a test entry file that creates webpack contexts for all the source and test files (see details [here](https://github.com/deepsweet/istanbul-instrumenter-loader))
 
 ---
 
-#### `angular2-router-loader`:
+#### `angular2-router-loader` (see code [here](https://github.com/brandonroberts/angular-router-loader/blob/master/src/index.js)):
 - Loader for Angular that enables string-based module loading with the Angular Router
 - Chain with Typescript loader like `awesome-typescript-loader`
 - In route config, use `loadChildren` with relative path to lazy-loaded Angular module. The string is delimited with a `#` where the right side of split is the angular module class name
@@ -200,7 +200,7 @@ export const routes: Routes = [
 
 ---
 
-#### `angular2-template-loader`:
+#### `angular2-template-loader` (see code [here](https://github.com/TheLarkInn/angular2-template-loader/blob/master/index.js)):
 - Loader for Angular that inlines your templates and stylesheets into angular components.
 - Chain with Typescript loader like `awesome-typescript-loader`, also need to pass .html and .css files through another loader (like `raw-loader`) first
 - Searches for `templateUrl` and `styleUrls` in Angular Component metadata and replaces with `require` statement
@@ -223,7 +223,7 @@ module: {
 
 ---
 
-#### `@ngtools/webpack`:
+#### `@ngtools/webpack` (see code [here](https://github.com/angular/angular-cli/tree/master/packages/%40ngtools/webpack/src)):
 - Use with AotPlugin to AoT compile Angular Typescript, use in place of another Typescript loader when doing AoT
 - See list of all AotPlugin options [here](https://www.npmjs.com/package/@ngtools/webpack) 
 
@@ -251,27 +251,6 @@ exports = { /* ... */
 ---
 
 ## Some other popular plugins
-
-#### `LoaderOptionsPlugin`
-- Exists to help move from webpack 1 to webpack 2
-  - With webpack 2 the schema for a webpack.config.js became stricter
-  - No longer open for extension by other loaders / plugins
-  - Intention is that you pass options directly to loaders / plugins. i.e. options are not global / shared
-  - Until a loader has been updated to depend upon options being passed directly to them, the loader-options-plugin exists to bridge the gap
-  - Can configure global / shared loader options with this plugin and all loaders will receive these options
-  - In the future this plugin may be removed
-
-```js
-new webpack.LoaderOptionsPlugin({
-  minimize: true,
-  debug: false,
-  options: {
-    context: __dirname
-  }
-})
-```
-
----
 
 #### `HtmlWebpackPlugin`
 - Simplifies creation of HTML files to serve your webpack bundles, see all options [here](https://github.com/ampedandwired/html-webpack-plugin)
@@ -377,6 +356,61 @@ new webpack.ProvidePlugin({ $: 'jquery', jQuery: 'jquery' })
 $('#item'); // just works
 jQuery('#item'); // just works
 ```
+
+---
+
+## `DllPlugin` and `DllReferencePlugin`
+
+- Provides another approach to resource code-splitting for improved caching and faster build times
+- Build vendor code into library bundle(s) (basically a mapping function that loads the appropriate vendor module from an id), on subsequent rebuilds where vendor code hasn't changed, the library bundle(s) is reused and the build is faster
+- Library bundle(s) can be long-term cached
+- Use two webpack config files, one for building library bundle(s) and other for building application
+- Use `DllPlugin` in webpack config to build library bundle and `DllReferencePlugin` in application bundle to reference it
+
+```js
+// app.webpack.config.js
+var webpack = require('webpack');
+module.exports = {
+  entry: {
+    app: ['./app'],
+  },
+  output: {
+    filename: 'app.bundle.js',
+    path: 'build/',
+  },
+  plugins: [new webpack.DllReferencePlugin({
+    context: '.',
+    manifest: require('./build/vendor-manifest.json'),
+  })]
+};
+```
+
+---
+
+## `DllPlugin` and `DllReferencePlugin`
+
+```js
+// vendor.webpack.config.js
+var webpack = require('webpack');
+module.exports = {
+  entry: { vendor: ['./vendor'] },
+  output: {
+    filename: 'vendor.bundle.js',
+    path: 'build/',
+    library: 'vendor_lib',
+  },
+  plugins: [new webpack.DllPlugin({
+    name: 'vendor_lib',
+    path: 'build/vendor-manifest.json',
+  })]
+};
+```
+- `manifest`: manifest file contains mapping from library bundle ids to actual module
+- `path`: absolute path to the manifest json file
+- `name`: name of the exposed dll function (keep consistent with output.library)
+- `context` (optional): context of requests in the manifest file, defaults to the webpack context
+- vs `CommonsChunkPlugin` the vendor code doesn't need to be recompiled every build
+- Which is better?  Depends on priorities.  Easy to experiment
 
 
 

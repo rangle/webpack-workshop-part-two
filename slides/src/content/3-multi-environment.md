@@ -103,7 +103,7 @@ module.exports = {
     process.env.NODE_ENV === 'production' ? prodPlugins : devPlugins;
 ```
 
-- Note: [chunkhash] slows down build time and is only useful to improve caching so only use it for production builds
+- Note: `[chunkhash]` slows down build time and is only useful to improve caching so only use it for production builds
 
 ---
 

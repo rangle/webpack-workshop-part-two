@@ -5,8 +5,8 @@
 ## Introduction
 
 - Two types of code-splitting in webpack
-- Resource splitting (to improve Parallel loading and Caching)
-- On-demand splitting87ru
+- Resource splitting (to improve Parallel loading and Caching), done via config
+- On-demand splitting, done in logic
   - Specify split-points in app logic for on-demand loading, webpack splits the modules and dependencies inside into a new chunk
 - Both splitting approaches allow splitting code into bundles to improve page load time (a bundle loaded quickly to allow some content to be shown sooner, and another bundle loaded later for less urgent code)
 - Can use with `CommonsChunkPlugin` to reduce code-size (reduce code redundancy and move it to single chunk)
@@ -122,31 +122,30 @@ Notes:
 
 ---
 
-## On-demand splitting (with `require.ensure()`, AMD `require()`, or `import()`)
+## On-demand splitting (with `require.ensure()`, or `import()`)
 
-- Webpack parses for `require.ensure()`, the AMD `require()`, or ES6 `import()` in the code while building and adds the modules into a separate chunk
-- This new chunk is loaded on demand by webpack through Jsonp (when `target` is `web`).
+- Webpack parses for `require.ensure()`, or ES6 `import()` in the code while building and adds the modules into a separate chunk
+- This new chunk is loaded on demand (and async) by webpack through Jsonp (when `target` is `web`).
 
 ```js
 require.ensure(dependencies: String[], callback: function(require), chunkName: String) // Standard Webpack v1 approach
-require(dependencies: String[], callback: function(depedency-exports))                 // AMD require approach
 import(dependency : String) : Promise                                                  // ES6 System.import approach
 ```
 
+Notes:
+
 - The dependencies are placed in a different chunk (can be another existing chunk for `require.ensure()`)
 - When using `require.ensure()` 
-    - The dependencies are loaded first (but not executed), then the callback is executed
-    - Callback is passed implementation of `require` (still need to `require` modules from depedencies to evaluate and use exports)
+    - The dependencies are loaded first (but not executed) when `require.ensure` is executed, then when loading complete the callback is executed
     - The split chunk can be named by the optional 3rd parameter (if existing then same instance is used).  This is the only approach that allows that
-- When using `require()` (AMD)
-    - The dependencies are loaded and executed and their exports are then passed to the optional callback
+    - Everything `require`'d in the callback is also put in same other chunk
 - When using `import()`
     - The function loads the module and returns a `Promise`.  Allows load failure to be handled
     - Can load multiple modules in parallel via `Promise.all()`
 
 ---
 
-## On-demand splitting (with `require.ensure()`, AMD `require()`, or `import()`)
+## On-demand splitting (with `require.ensure()`, or `import()`)
 
 ```js
 require.ensure(["module-a", "module-b"], function() {
@@ -155,14 +154,7 @@ require.ensure(["module-a", "module-b"], function() {
 });
 ```
 - `module-a` and `module-b` are loaded asynchronously (but not executed) then the callback function is called, within callback module-a is executed
-
-```js
-// AMD require
-require(["module-a", "module-b"], function(a, b) {
-  ...
-});
-```
-- `module-a` and `module-b` are loaded and executed asynchronously then the callback function is called and passed the exports of both modules
+- Not necessary to put modules in dependency array, but is recommended
 
 ```js
 import("./module-a").then(module => {
@@ -180,8 +172,7 @@ import("./module-a").then(module => {
 Advantages:
 - Fewer style tags (older IE has a limit)
 - CSS SourceMap (with `devtool: "source-map"` and `css-loader?sourceMap`)
-- CSS requested in parallel
-- CSS cached separate
+- CSS requested in parallel and cached separate
 - Faster runtime (less code and DOM operations)
 
 Caveats:
@@ -222,22 +213,26 @@ module.exports = {
 ## CSS splitting (with `ExtractTextPlugin`)
 
 ```js
-new ExtractTextPlugin(options: filename | object) // plugin
+new ExtractTextPlugin(options: string | object) // plugin
 ```
 
-- `options.filename: string` (required) the filename of the result file. May contain `[name]`, `[id]` and `[contenthash]`
+- `filename: string` (required) the filename of the result file. May contain `[name]`, `[id]` and `[contenthash]`
     - `[contenthash]`: a hash of the content of the extracted file
-- `options.allChunks: boolean` extract from all additional chunks too (by default it extracts only from the initial chunk(s))
-- `options.disable: boolean` disables the plugin
-- `options.id: string` Unique ident for this plugin instance. (For advanced usage only, by default automatically generated)
+- `allChunks: boolean` extract from all additional chunks too (by default it extracts only from the initial chunk(s))
+- `disable: boolean` disables the plugin
+- `id: string` Unique ident for this plugin instance. (For advanced usage only, by default automatically generated)
+
+---
+
+## CSS splitting (with `ExtractTextPlugin`)
 
 ```js
-ExtractTextPlugin.extract(options: loader | object) // loader
+ExtractTextPlugin.extract(options: string | object) // loader
 ```
 - Creates an extracting loader from an existing loader. Supports loaders of type `{ loader: string; query: object }`
-- `options.loader: string | object | loader[]` (required) the loader(s) to use for converting the resource to a css exporting module
-- `options.fallbackLoader: string | object | loader[]` the loader(s) to use when the css is not extracted (i.e. in an additional chunk when `allChunks: false`)
-- `options.publicPath: string` override the `publicPath` setting for this loader
+- `loader: string | object | loader[]` (required) the loader(s) to use for converting the resource to a css exporting module
+- `fallbackLoader: string | object | loader[]` the loader(s) to use when the css is not extracted (i.e. in an additional chunk when `allChunks: false`)
+- `publicPath: string` override the `publicPath` setting for this loader
 
 ---
 
@@ -270,57 +265,12 @@ module.exports = {
 
 ---
 
-## `DllPlugin` and `DllReferencePlugin`
+## Exercise
 
-- Provides another approach to resource code-splitting for improved caching and faster build times
-- Build vendor code into library bundle(s) (basically a mapping function that loads the appropriate vendor module from an id), on subsequent rebuilds where vendor code hasn't changed, the library bundle(s) is reused and the build is faster
-- Library bundle(s) can be long-term cached
-- Use two webpack config files, one for building library bundle(s) and other for building application
-- Use `DllPlugin` in webpack config to build library bundle and `DllReferencePlugin` in application bundle to reference it
+(Duration: 15 minutes)
 
-```js
-// app.webpack.config.js
-var webpack = require('webpack');
-module.exports = {
-  entry: {
-    app: ['./app'],
-  },
-  output: {
-    filename: 'app.bundle.js',
-    path: 'build/',
-  },
-  plugins: [new webpack.DllReferencePlugin({
-    context: '.',
-    manifest: require('./build/vendor-manifest.json'),
-  })]
-};
-```
+Modify exercise-5 for vendor code splitting with `CommonsChunkPlugin` (and compare sizes of the bundles before and after).
 
----
-
-## `DllPlugin` and `DllReferencePlugin`
-
-```js
-// vendor.webpack.config.js
-var webpack = require('webpack');
-module.exports = {
-  entry: { vendor: ['./vendor'] },
-  output: {
-    filename: 'vendor.bundle.js',
-    path: 'build/',
-    library: 'vendor_lib',
-  },
-  plugins: [new webpack.DllPlugin({
-    name: 'vendor_lib',
-    path: 'build/vendor-manifest.json',
-  })]
-};
-```
-- `manifest`: manifest file contains mapping from library bundle ids to actual module
-- `path`: absolute path to the manifest json file
-- `name`: name of the exposed dll function (keep consistent with output.library)
-- `context` (optional): context of requests in the manifest file, defaults to the webpack context
-- vs `CommonsChunkPlugin` the vendor code doesn't need to be recompiled every build
-- Which is better?  Depends on priorities.  Easy to experiment
+Also, use `require.ensure` to set an on-demand split point to load `bore-most.js` from a seperate chunk (hint: the `require.ensure` should be in `bore-more.js`) 
 
 
