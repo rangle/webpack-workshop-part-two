@@ -19,11 +19,11 @@
 
 ## The Slides and Exercises
 
-- Clone the repo: **git@github.com:rangle/advanced-webpack-workshop.git**
+- Clone the repo: **git@github.com:rangle/webpack-workshop-part-two.git**
 - Install dependencies and run the slides
 
 ```sh
-git clone git@github.com:rangle/advanced-webpack-workshop.git
+git clone git@github.com:rangle/webpack-workshop-part-two.git
 cd advanced-webpack-workshop/slides
 npm install
 npm start
