@@ -416,9 +416,13 @@ module.exports = {
 
 ## Exercise
 
-(Duration: 15 minutes)
+(Duration: 10 minutes)
 
-Modify exercise-6 to use  
+Modify exercise-6 to use `DllPlugin` and `DllReferencePlugin` for packaging the vendor code in a library 
+
+(Note: you'll need two build scripts and two webpack.config.js files, or else one config file that uses an environment variable to specify library or app build)
+
+Compare the results with those achieved via `CommonsChunkPlugin`
 
 
 
