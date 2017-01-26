@@ -61,7 +61,7 @@ style.unuse(); // or style.unref();
 ---
 
 #### `postcss-loader` (see code [here](https://github.com/postcss/postcss-loader/blob/master/index.js)):
-- Use postcss plugins to process CSS, chain after `css-loader` (first loader in CSS file loader chain)
+- Use postcss plugins to process CSS, chain with `css-loader` (should be first loader in CSS file loader chain)
 - Can configure postcss plugins directly in `webpack.config.js` but recommended to place in `postcss.config.js`
 - Set `importLoaders=1` option if used before `css-loader` in chain (or >1 if other loaders before also)
 
@@ -411,6 +411,14 @@ module.exports = {
 - `context` (optional): context of requests in the manifest file, defaults to the webpack context
 - vs `CommonsChunkPlugin` the vendor code doesn't need to be recompiled every build
 - Which is better?  Depends on priorities.  Easy to experiment
+
+---
+
+## Exercise
+
+(Duration: 15 minutes)
+
+Modify exercise-6 to use  
 
 
 

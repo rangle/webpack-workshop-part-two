@@ -116,7 +116,16 @@ Notes:
 
 - See [here](https://webpack.js.org/guides/caching/) for detailed notes about long-term caching
 
+- Use `[chunkhash]` to add a content-dependent cache-buster to each bundle
+- Extract the webpack manifest into a separate file with `chunk-manifest-webpack-plugin`
+- Help make hashes more deterministic by file content (via more deterministic generated internal ids), use `NamedModulesPlugin` (recommended for development) and `HashedModuleIdsPlugin` (recommended for production)
+- Use better hash algorithm via `webpack-chunk-hash` or `webpack-md5-hash` plugins
+- Try to ensure that the entry point chunk (with the bootstrapping code) doesn’t change hash over time for the same set of dependencies
 
+For even more optimized setup:
+
+- Use compiler stats to get the file names when requiring resources in HTML or use `html-webpack-plugin` to place them automatically
+- Generate the chunk manifest JSON and inline it into the HTML page before loading resources (by using  `html-webpack-plugin` with `script-ext-html-webpack-plugin` or `inline-manifest-webpack-plugin`)
 
 
 
