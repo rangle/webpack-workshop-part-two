@@ -271,7 +271,7 @@ module.exports = {
 
 ## `DllPlugin` and `DllReferencePlugin`
 
-- Provides another approach to code-splitting for improved caching and faster build times
+- Provides another approach to resource code-splitting for improved caching and faster build times
 - Build vendor code into library bundle(s) (basically a mapping function that loads the appropriate vendor module from an id), on subsequent rebuilds where vendor code hasn't changed, the library bundle(s) is reused and the build is faster
 - Library bundle(s) can be long-term cached
 - Use two webpack config files, one for building library bundle(s) and other for building application

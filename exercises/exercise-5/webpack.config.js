@@ -1,5 +1,6 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
+const StyleLintPlugin = require('stylelint-webpack-plugin');
 
 module.exports = {
   context: __dirname + '/src',
@@ -9,18 +10,29 @@ module.exports = {
   },
   output: {
     path: __dirname + '/dist',
-    filename: process.env.NODE_ENV === 'production' ? '[name].[chunkhash].js' : '[name].js'
+    filename: '[name].[chunkhash].js'
   },
   resolve: {
     extensions: ['.ts', '.js'],
   },
-  devtool: process.env.NODE_ENV === 'production' ? 'source-map' : 'inline-source-map',
+  devtool: 'source-map',
   module: {
     rules: [{
       test: /\.ts$/,
       enforce: 'pre',
       loader: 'tslint-loader',
       exclude: /node_modules/,
+    },
+    {
+      test: /\.js$/,
+      enforce: 'pre',
+      loader: 'eslint-loader',
+      exclude: /node_modules/,
+    },
+    {
+      test: /\.js$/,
+      loader: 'babel-loader',
+      exclude: /node_modules/
     },
     {
       test: /\.ts$/,
@@ -38,15 +50,16 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './index.html'
     }),
-    new webpack.DefinePlugin({
-      PRODUCTION: process.env.NODE_ENV === 'production',
-      GET_DATA_URL: process.env.NODE_ENV === 'production' ? JSON.stringify('https://jsonplaceholder.typicode.com/posts/2')
-        : JSON.stringify('https://jsonplaceholder.typicode.com/posts/3'),
-      POST_ERROR_URL: JSON.stringify('http://jsonplaceholder.typicode.com/posts')
+    new webpack.optimize.UglifyJsPlugin({
+      sourceMap: true
+    }),
+    new StyleLintPlugin({
+      configFile: './.stylelintrc',
+      context: './src',
+      files: '*.css',
+      failOnError: false,
     })
-  ].concat(process.env.NODE_ENV === 'production' ? [new webpack.optimize.UglifyJsPlugin({
-    sourceMap: true
-  })] : []),
+  ],
   devServer: {
     noInfo: true,
     port: 8081
