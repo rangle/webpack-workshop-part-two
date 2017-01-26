@@ -5,30 +5,77 @@
 ## Main improvements in v2
 
 - Native ES6 module support (& mixing CommonJS, AMD, ES6 modules, even in same file)
+
 - Tree-shaking
+
 - Configuration simplifications and improvements
+
 - Better performance (maybe/eventually)
 
-----
+---
 
 ## Configuration change areas in v2
 
-- Some property name/structure changes
+- Option name/structure changes
+
 - Loader config changes
+
 - Plugin config changes (ExtractTextPlugin, OccurrenceOrderPlugin, UglifyJsPlugin)
+
 - [See webpack 2 docs for full details](https://webpack.js.org/guides/migrating/)
 
 ---
 
 ### `resolve.*`:
 
-- new `resolve.enforceExtension` property that when true requires imports to include file extension (defaults to false).  No longer need to add empty string to `resolve.extensions` to accomplish this
-- `resolve.root`, `resolve.fallback`, `resolve.modulesDirectories` are combined into `resolve.modules`
-- see [Resolve property docs](https://webpack.js.org/configuration/resolve/) for full details
+- Options that determine how modules are resolved (where to look for them)
+
+- No longer need empty string in `resolve.extensions` (use new `resolve.enforceExtension` property instead)
+
+```js
+  resolve: {
+-   extensions: ["", ".js", ".json"]
++   extensions: [".js", ".json"]
+  }
+```
+
+- `resolve.root`, `resolve.fallback`, `resolve.modulesDirectories` combined into `resolve.modules`
+
+```js
+  resolve: {
+-   root: path.join(__dirname, "src")
++   modules: [
++     path.join(__dirname, "src"),
++     "node_modules"
++   ]
+  }
+```
+
+- See [Resolve property docs](https://webpack.js.org/configuration/resolve/) for full details
 
 ---
 
-### `module.loaders`  ->  `module.rules` and no automatic `-loader`:
+### `module.loaders`  ->  `module.rules`
+- Can still use `module.loaders` for now if desired, though recommended to switch to `module.rules`
+
+```js
+// Webpack 1
+  module: {
+    loaders: [
+      {
+        test: /\.css$/,
+      ...
+  // Webpack 2
+  module: {
+      rules: [ 
+        {
+          test: /\.css$/,
+      ...
+``` 
+
+---
+
+### `module.loaders.loaders`  ->  `module.rules.use`
 
 ```js
 // Webpack 1
@@ -40,63 +87,87 @@
           {
             loader: "style"
           },
-          {
-            loader: "css",
-            query: {
-              modules: true
-            }
-          }
-        ]
-      }
-    ]
-  }
+      ...
+  // Webpack 2
+  module: {
+      rules: [ 
+        {
+          test: /\.css$/,
+          use: [
+            {
+              loader: "style-loader"
+            },
+       ...
 ``` 
 
 ---
 
-### `module.loaders`  ->  `module.rules` and no automatic `-loader`:
-- Can still use `module.loaders` for now if desired, though recommended to switch to `module.rules`
-  - If using `module.loaders` can still use `!` chain for multiple loaders, if using `module.rules` must chain loaders as shown below
-- `module.rules[i].loader` is optional shortcut to `module.rules[i].use.loader` 
-  - For optional use if single loader in chain and it has no `options`, or the options are provided in the loader with `?` query string
+### `module.rules.loader` is optional shortcut to `module.rules.use.loader` 
+ - For optional use if single loader in chain and it has no `options`, or the options are provided in the loader with `?` query string
 
 ```js
-// Webpack 2
+ module: {
+      rules: [ 
+        {
+          test: /\.css$/,
+          use: [
+            {
+              loader: "style-loader"
+            },
+        ...
   module: {
-    rules: [
-      {
-        test: /\.css$/,
-        use: [
-          {
-            loader: "style-loader"
-          },
-          {
-            loader: "css-loader",
-            options: {
-              modules: true
-            }
-          }
-        ]
-      }
-    ]
-  }
+      rules: [ 
+        {
+          test: /\.css$/,
+          loader: "style-loader"
+        }
+      ...
 ```
 
 ---
 
-### `module.loaders`  ->  `module.rules` and no automatic `-loader`:
-
-- If desired you can still fall back to the auto `-loader` style:
+### no automatic `-loader`:
 
 ```js
+// Webpack 1
+        loaders: [
+          {
+            loader: "style"
+          },
+      ...
+  // Webpack 2
+        use: [
+          {
+            loader: "style-loader"
+          },
+      ...
+``` 
+
+- If desired you can still fall back to the auto `-loader` style by setting `resolveLoader.moduleExtensions`:
+
+```js
+
 resolveLoader: {
   moduleExtensions: ["-loader"]
 }
 ```
 
+---
+
 ### `json-loader` not required:
 
 - When no loader has been configured for a JSON file, webpack will automatically try to load the JSON file with the `json-loader`
+
+```js
+ module: {
+    rules: [
+-     {
+-       test: /\.json/,
+-       loader: "json-loader"
+-     }
+    ]
+  }
+```
 
 ---
 
@@ -248,12 +319,9 @@ module: {
 ### `UglifyJsPlugin` minimize loaders
 - UglifyJsPlugin no longer switches loaders into minimize mode. The `minimize: true` setting needs to be passed via loader options
 
-### `OccurrenceOrderPlugin` is now on by default
-- It's no longer necessary to specify it in configuration
-
 ---
 
-### `new ExtractTextPlugin({options})`
+### `ExtractTextPlugin({options})`
 
 ```js
 // Webpack 1
@@ -309,7 +377,7 @@ module: {
 module: {
   rules: [
     test: /.css$/,
-    loader: ExtractTextPlugin.extract['style-loader', 'css-loader?modules-true!postcss-loader!sass-loader-loader']
+    loader: ExtractTextPlugin.extract['style-loader', 'css-loader?modules=true!postcss-loader!sass-loader']
   ]
 }
 ```

@@ -22,23 +22,27 @@
 ## Javascript Linters
 
 **ESLint**
-- Newest and most popular with best ES6 support, and JSX support
-- Highly configurable and more flexible and extensible than others, but can be slow
-- Can use with React via `eslint-plugin-react`
-- Can use with `babel-eslint` to support Class properties, decorators and types
-- Can use JS comments to embed config info directly into a file. (enbale, disable, or configure rules)
-- Can use a JS, JSON or YAML config file to specify config info for an entire directory and all of its subdirectories
-  - This can be in the form of an `.eslintrc.*` file or an `eslintConfig` field in a `package.json` file, or you can specify a config file on the command line
-- Can configure environments (each with it a certain set of predefined global variables), globals, and rules (which rules are enabled and at what error level)
+- Newest and most popular, best ES6 support, and JSX support
+
+- Highly configurable, more flexible and extensible than others, but can be slow
+
+- Use with React via `eslint-plugin-react`
+
+- Use with `babel-eslint` to lint class properties, decorators and types
+
+- Optional JS comments to embed config info directly into JS file
+
+- Optional JS, JSON or YAML config file
+  - Could be `.eslintrc.*` file, `eslintConfig` property in `package.json`, or another config file specified via CLI
 
 ---
 ## Javascript Linters
 
 **ESLint**
-- Use with webpack via `eslint-loader`, can use `.eslintrc.*` (or custom) file or an `eslintConfig` field in a `package.json` to pass options.
-- Can also pass loader options in `webpack.config.js`, but these options are fed to `CLIEngine` (see [here](http://eslint.org/docs/developer-guide/nodejs-api#cliengine))
-- Setting as pre-loader ensures it is run before other loaders
-- Can use `emitErrors`, `emitWarnings`, `quiet`, `failOnWarning`, `failOnError`, and `outputReport` to determine how warnings and errors are displayed and whether they should fail the build
+- Use with webpack via `eslint-loader`
+- Can use loader options in `webpack.config.js`, but these options are fed to `CLIEngine` (see [here](http://eslint.org/docs/developer-guide/nodejs-api#cliengine))
+- Set as pre-loader to run before other loaders
+- Options `emitErrors`, `emitWarnings`, `quiet`, `failOnWarning`, `failOnError`, and `outputReport` determine how warnings and errors are displayed and whether they fail the build
 
 ```js
 module.exports = {
@@ -61,10 +65,10 @@ module.exports = {
 
 ## Typescript linters
 **TSLint**
-- Configurable and extensible linter for Typescript, only popular choice for Typescript linting
-- Checks for readability, maintainability, and functionality errors
-- Use with webpack via `tslint-loader`, can use `tslint.json` (or custom) file for options
-- Can also pass loader options in `webpack.config.js` (currently must use the `LoaderOptionsPlugin`). Can use `configuration.rules`, `configFile`, `emitErrors`, `failOnHint`, and other options (see full list [here](https://github.com/wbuchwalter/tslint-loader)) to configure rules and error output, or fail the build on errors 
+- Linter for Typescript, only popular choice
+- Use with webpack via `tslint-loader`, use `tslint.json` (or custom) file for options
+- Optionally pass loader options in `webpack.config.js` (currently must use the `LoaderOptionsPlugin`)
+- Use `configuration.rules`, `configFile`, `emitErrors`, `failOnHint`, and other options (see full list [here](https://github.com/wbuchwalter/tslint-loader))
 
 ```js
 module.exports = {
@@ -90,8 +94,9 @@ module.exports = {
 - Older tool for CSS linting
 
 **Stylelint**
-- Newer, more popular tool for CSS linting with many built in tools, use config file to enable and configure rules (typically `.stylelintrc`)
-- To use with webpack use `stylelint-webpack-plugin`, load options via plugin, can use `config`, `configFile`, `files`, `failOnError`, `quiet` and others (see full list [here](https://github.com/JaKXz/stylelint-webpack-plugin) and [here](http://stylelint.io/user-guide/node-api/#options))
+- Newer, more popular tool for CSS linting, use config file to enable and configure rules (typically `.stylelintrc`)
+- For webpack use with `stylelint-webpack-plugin`
+- Options via plugin config, `config`, `configFile`, `files`, `failOnError`, `quiet` and others (see full list [here](https://github.com/JaKXz/stylelint-webpack-plugin) and [here](http://stylelint.io/user-guide/node-api/#options))
 
 ```js
 module.exports = {

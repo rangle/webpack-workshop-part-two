@@ -4,19 +4,13 @@
 
 ## Introduction
 
-- Intermediate build products (collections of modules) are called **chunks** and final build files (also colletions of modules) are **bundles**
-- Two main purposes for code-splitting in Webpack which results in two types of code-splitting
+- Two types of code-splitting in webpack
 - Resource splitting (to improve Parallel loading and Caching)
-  - Specify split points in configuration
-  - Split JS code into different bundles (like application and vendor) to aid Caching
-  - Portions of the code that don't change much (like vendor code) can be stored in seperate bundle and held in cache longer
-  - For multi-page apps can split the JS into multiple bundles, each bundle to be loaded with the appropriate page
-  - Split CSS from JS improving cacheability of the CSS and allowing it to be loaded in parallel with the JS
-- On-demand splitting
-  - Specify split points in application logic to allow on-demand loading of bundles as needed (e.g. load a bundle when routing or on another event)
-  - Uses `require.ensure()` or `import()` to specify split-points, webpack splits the modules and dependencies inside into a new chunk
+- On-demand splitting87ru
+  - Specify split-points in app logic for on-demand loading, webpack splits the modules and dependencies inside into a new chunk
 - Both splitting approaches allow splitting code into bundles to improve page load time (a bundle loaded quickly to allow some content to be shown sooner, and another bundle loaded later for less urgent code)
-- Can use with `CommonsChunkPlugin` to reduce code-size (reduce code redundancy and move it to single chunk), and/or `DllPlugin`/`DllReferencePlugin` for build-time performance (store/use cached built vendor/library bundles)
+- Can use with `CommonsChunkPlugin` to reduce code-size (reduce code redundancy and move it to single chunk)
+- Or can use `DllPlugin`/`DllReferencePlugin` for better build-time performance (store/cache built vendor library bundles)
 
 ---
 
@@ -77,7 +71,7 @@ entry: {
 
 - Extracts all common modules from source chunks and puts them in a common chunk. If it doesn't already exist, then creates a new one
 - Webpack creates runtime and manifest code, and when `CommonsChunkPlugin` is used this code is placed in the common chunk.  
-- To enable long-term caching, add another common chunk so this code is stored in a seperate chunk and doesn't cause the primary common chunk to change with every build.  An alternative is to have the manifest output to a seperate file via a plugin like `ChunkManifestPlugin`
+- Use options (full list [here](https://webpack.js.org/plugins/commons-chunk-plugin/)) to tailor to use-case (see plugin source [here](https://github.com/webpack/webpack/blob/master/lib/optimize/CommonsChunkPlugin.js))
 
 ```js
 var webpack = require('webpack');
@@ -100,12 +94,9 @@ module.exports = function(env) {
 }
 ```
 
----
+Notes:
 
-## `CommonsChunkPlugin`
-
-- The Common chunk(s) become the parent chunks of the source chunks
-- Use options (full list [here](https://webpack.js.org/plugins/commons-chunk-plugin/)) to tailor to use-case (see plugin source [here](https://github.com/webpack/webpack/blob/master/lib/optimize/CommonsChunkPlugin.js))
+- To enable long-term caching, add another common chunk so this code is stored in a seperate chunk and doesn't cause the primary common chunk to change with every build.  An alternative is to have the manifest output to a seperate file via a plugin like `ChunkManifestPlugin`
 - `name` or `names` specify the name(s) of common chunk(s)
     - If matches existing chunk(s), then that chunk(s) will be the common chunk(s) (multiple `names` result in multiple runs of the plugin)
     - If the `name` doesn't match an existing chunk then a new chunk will be created with matching name(s)
@@ -118,6 +109,16 @@ module.exports = function(env) {
 - `chunks` the array of source chunks (if omitted all entry chunks are used)
 - `children` if set to `true`, overrides `chunks`, and all children of the common chunk are sources (common modules moved up to parent common chunk)
 - `async` if set to `true`, a seperate chunk is created as a child of the common chunk, this async chunk will contain all the common modules and will be loaded in parallel, set to a `string` to name that async bundle
+
+---
+
+## Long-term Caching
+
+- See [here](https://webpack.js.org/guides/caching/) for detailed notes about long-term caching
+
+
+
+
 
 ---
 

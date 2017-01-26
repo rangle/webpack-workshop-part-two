@@ -4,7 +4,7 @@
 
 ## `DefinePlugin`
 
-- The `DefinePlugin` allows you to create global constants which can be configured at compile time. This can be very useful for allowing different behaviour between builds for different environments
+- The `DefinePlugin` allows you to create global constants which can be configured at compile time. 
 
 ```js
 // webpack.config.js
@@ -12,17 +12,15 @@ new webpack.DefinePlugin({
   PRODUCTION: JSON.stringify(true),
   VERSION: JSON.stringify("5fa3b9"),
   BROWSER_SUPPORTS_HTML5: true,
-  TWO: "1+1",
-  "typeof window": JSON.stringify("object")
+  TWO: "1+1"
 })
 ```
 
-- Note that because the plugin does a direct text replacement, the value given to it must include actual quotes inside of the string itself. Typically, this is done either with alternate quotes, such as `'"production"'`, or by using `JSON.stringify('production')`
-- Each key passed into `DefinePlugin` is an identifier or multiple identifiers joined with `.`
+Notes:
+
+- Each key is an identifier or multiple identifiers joined with `.`
 - If the value is a string it will be used as a code fragment.
 - If the value isn't a string, it will be stringified (including functions).
-- If the value is an object all keys are defined the same way.
-- If you prefix `typeof` to the key, it's only defined for `typeof` calls.
 
 ---
 
@@ -110,6 +108,7 @@ module.exports = {
 ---
 
 ## Source maps
+- Use `devtool` option
 
 | devtool |	build |	rebuild |	production | quality |
 |---------|-------|---------|------------|---------|
@@ -129,16 +128,16 @@ module.exports = {
 ### For development
 
 `eval` 
-- Each module is executed with `eval()` and `//@ sourceURL`. This is very fast. The main disadvantage is that it doesn't display line numbers correctly since it gets mapped to transpiled code instead of the original code.
+- Very fast. Doesn't display line numbers correctly (mapped to transpiled code instead of original code).
 
 `inline-source-map` 
-- A SourceMap is added as DataUrl to the bundle.
+- SourceMap added as DataUrl to the bundle (makes it much larger). Slow
 
 `eval-source-map` 
-- Each module is executed with `eval()` and a SourceMap is added as DataUrl to the `eval()`. Initially it is slow, but it provides fast rebuild speed and yields real files. Line numbers are correctly mapped since it gets mapped to the original code.
+- Initially slow, fast rebuild speed. Larger bundles (uses DataUrl). Line numbers are correctly mapped since it gets mapped to the original code.
 
 `cheap-module-eval-source-map`
-- Like `eval-source-map`, each module is executed with `eval()` and a SourceMap is added as DataUrl to the `eval()`. It is "cheap" because it doesn't have column mappings, it only maps line numbers.
+- Like `eval-source-map`, but faster and smaller because it doesn't have column mappings, it only maps line numbers.
 
 ---
 
@@ -147,19 +146,19 @@ module.exports = {
 ### For production
 
 `source-map` 
-- A full SourceMap is emitted as a separate file. It adds a reference comment to the bundle so development tools know where to find it.
+- SourceMap as a separate file. Adds a reference comment to the bundle (to link to file).
 
 `hidden-source-map` 
-- Same as source-map, but doesn't add a reference comment to the bundle. Useful if you only want SourceMaps to map error stack traces from error reports, but don't want to expose your SourceMap for the browser development tools.
+- Same as source-map, but doesn't add a reference comment to the bundle (needs to be manually added to debug).
 
 `cheap-source-map` 
-- A SourceMap without column-mappings ignoring loaded Source Maps.
+- A SourceMap without column-mappings and ignoring loaded Source Maps.
 
 `cheap-module-source-map` 
-- A SourceMap without column-mappings that simplifies loaded Source Maps to a single mapping per line.
+- A SourceMap without column-mappings, loaded Source Maps are single mapping per line
 
 `nosources-source-map` 
-- A SourceMap is created without the sourcesContent in it. It can be used to map stack traces on the client without exposing all of the source code.
+- A SourceMap without the sourcesContent in it. Can be used to map stack traces on the client without exposing source code.
 
 ---
 
@@ -167,4 +166,6 @@ module.exports = {
 
 (Duration: 10 minutes)
 
-Modify the build system in exercise-3 to have a development and production build with appropriate source maps, and plugins
+Modify the build system in exercise-3 to have a development and production build (via seperate npm scripts) with appropriate source maps, plugins, and other relevant webpack config. 
+
+Also the development build logs errors to console but production should post them to API, make API URLs configurable in webpack config.
