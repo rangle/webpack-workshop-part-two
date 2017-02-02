@@ -49,6 +49,6 @@ module.exports = {
   })] : []),
   devServer: {
     noInfo: true,
-    port: 8081
+    port: 8082
   }
 };

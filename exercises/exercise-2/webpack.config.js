@@ -42,6 +42,6 @@ module.exports = {
   ts: { transpileOnly: true },
   devServer: {
     noInfo: true,
-    port: 8081
+    port: 8082
   }
 };
