@@ -24,7 +24,7 @@
 
 ```sh
 git clone git@github.com:rangle/webpack-workshop-part-two.git
-cd advanced-webpack-workshop/slides
+cd webpack-workshop-part-two/slides
 npm install
 npm start
 ```
